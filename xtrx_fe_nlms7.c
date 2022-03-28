@@ -1197,7 +1197,7 @@ int lms7nfe_bb_set_badwidth(struct xtrx_fe_obj* obj,
 			bparam_set_val(&dev->rx_bw[(j == LMS7_CH_A) ? 0 : 1], bw);
 
 //			res = lms7_rbb_set_ext(&dev->lms_state);
-#if 1
+#if 0
 
 			///////////////// FIXMEEEEEEEEEE!!!!!!!!!!!!!!!!!!!!!!!!
 			res = lms7_rbb_set_path(&dev->lms_state, RBB_LBF);
@@ -1205,13 +1205,18 @@ int lms7nfe_bb_set_badwidth(struct xtrx_fe_obj* obj,
 				return res;
 
 			res = lms7_rbb_set_bandwidth(&dev->lms_state, bw);
+#else
+			res = lms7_rbb_set_filter_bw(&dev->lms_state,j,bw);
+#endif
 			if (actualbw)
 				*actualbw = bw;
-#endif
 		} else if (dir == XTRX_TUNE_BB_TX) {
 			bparam_set_val(&dev->tx_bw[(j == LMS7_CH_A) ? 0 : 1], bw);
-
+#if 1
+			res = lms7_tbb_set_filter_bw(&dev->lms_state,j,bw);
+#else
 			res = lms7_tbb_set_bandwidth(&dev->lms_state, bw);
+#endif
 			if (actualbw)
 				*actualbw = bw;
 		}
