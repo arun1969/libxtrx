@@ -585,6 +585,9 @@ int lms7nfe_dd_set_samplerate(struct xtrx_fe_obj* obj,
 		if (res == 0) {
 			// TODO FIXME!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11
 			actualmaster = cgen_rate;
+			dev->lms_state.cgen_freq = cgen_rate;
+			dev->lms_state.txdiv = clkdiv;
+
 			break;
 		}
 	}
@@ -1350,11 +1353,15 @@ int lms7nfe_fe_set_freq(struct xtrx_fe_obj* obj,
 
 	if (type == XTRX_TUNE_TX_AND_RX_TDD) {
 		dev->rx_lo = dev->tx_lo = res_freq;
+		dev->lms_state.sxt_freq = dev->lms_state.sxr_freq = res_freq;
+
 	} else {
 		if (!rx) {
 			dev->tx_lo = res_freq;
+			dev->lms_state.sxt_freq = res_freq;
 		} else {
 			dev->rx_lo = res_freq;
+			dev->lms_state.sxr_freq = res_freq;
 		}
 	}
 
