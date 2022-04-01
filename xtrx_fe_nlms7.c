@@ -1278,6 +1278,7 @@ int lms7nfe_set_gain(struct xtrx_fe_obj* obj,
 		actual = -aret;
 		break;
 	case XTRX_RX_PGA_GAIN:
+		gain = clamp(gain, -12.5, 12.5);
 		actual = gain;
 		res = lms7_rbb_set_pga(&dev->lms_state, gain + 12.5);
 		break;
@@ -1363,7 +1364,6 @@ int lms7nfe_fe_set_freq(struct xtrx_fe_obj* obj,
 	if (type == XTRX_TUNE_TX_AND_RX_TDD) {
 		dev->rx_lo = dev->tx_lo = res_freq;
 		dev->lms_state.sxt_freq = dev->lms_state.sxr_freq = res_freq;
-
 	} else {
 		if (!rx) {
 			dev->tx_lo = res_freq;
@@ -1436,11 +1436,11 @@ int lms7nfe_fe_set_lna(struct xtrx_fe_obj* obj,
 	if (tx) {
 		dev->tx_lna_auto = false;
 		dev->tx_band = band;
-		return _xtrx_set_lna_tx(dev, band);
+		return _xtrx_set_lna_tx(dev);
 	} else {
 		dev->rx_lna_auto = false;
 		dev->rx_band = band;
-		return _xtrx_set_lna_rx(dev, band);
+		return _xtrx_set_lna_rx(dev);
 	}
 }
 
