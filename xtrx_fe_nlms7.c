@@ -286,6 +286,7 @@ int lms7nfe_init(struct xtrxll_dev* lldev,
 	dev->rx_lna_auto = true;
 	dev->tx_lna_auto = true;
 	dev->rx_disconnect = false;
+	dev->trf_lb_active = false;
 	dev->rx_lo = 0;
 	dev->tx_lo = 0;
 
@@ -590,7 +591,6 @@ int lms7nfe_dd_set_samplerate(struct xtrx_fe_obj* obj,
 			actualmaster = cgen_rate;
 			dev->lms_state.cgen_freq = cgen_rate;
 			dev->lms_state.txdiv = clkdiv;
-
 			break;
 		}
 	}
@@ -957,7 +957,7 @@ int lms7nfe_dd_configure(struct xtrx_nfe_lms7* dev,
 			if (dev->rx_bw[ich].set) {
 				XTRXLLS_LOG("LMSF", XTRXLL_INFO, "%s: RBB Restore BW[%d]=%d\n",
 							xtrxll_get_name(dev->lldev), ich, dev->rx_bw[ich].value);
-				res = lms7_rbb_set_bandwidth(&dev->lms_state, dev->rx_bw[ich].value);
+				res = lms7_rbb_set_bandwidth(&dev->lms_state, lch, dev->rx_bw[ich].value);
 				if (res)
 					return res;
 			}
@@ -1008,7 +1008,7 @@ int lms7nfe_dd_configure(struct xtrx_nfe_lms7* dev,
 			if (dev->tx_bw[ich].set) {
 				XTRXLLS_LOG("LMSF", XTRXLL_INFO, "%s: TBB Restore BW[%d]=%d\n",
 							xtrxll_get_name(dev->lldev), ich, dev->tx_bw[ich].value);
-				res = lms7_tbb_set_bandwidth(&dev->lms_state, dev->tx_bw[ich].value);
+				res = lms7_tbb_set_bandwidth(&dev->lms_state, lch, dev->tx_bw[ich].value);
 				if (res)
 					return res;
 			}
@@ -1206,18 +1206,18 @@ int lms7nfe_bb_set_badwidth(struct xtrx_fe_obj* obj,
 
 		if (dir == XTRX_TUNE_BB_RX) {
 			bparam_set_val(&dev->rx_bw[(j == LMS7_CH_A) ? 0 : 1], bw);
-
+#if 1
+			res = lms7_rbb_set_filter_bw(&dev->lms_state,j,bw);
+#else
 //			res = lms7_rbb_set_ext(&dev->lms_state);
-#if 0
+
 
 			///////////////// FIXMEEEEEEEEEE!!!!!!!!!!!!!!!!!!!!!!!!
 			res = lms7_rbb_set_path(&dev->lms_state, RBB_LBF);
 			if (res)
 				return res;
 
-			res = lms7_rbb_set_bandwidth(&dev->lms_state, bw);
-#else
-			res = lms7_rbb_set_filter_bw(&dev->lms_state,j,bw);
+			res = lms7_rbb_set_bandwidth(&dev->lms_state,j,bw);
 #endif
 			if (actualbw)
 				*actualbw = bw;
@@ -1226,7 +1226,7 @@ int lms7nfe_bb_set_badwidth(struct xtrx_fe_obj* obj,
 #if 1
 			res = lms7_tbb_set_filter_bw(&dev->lms_state,j,bw);
 #else
-			res = lms7_tbb_set_bandwidth(&dev->lms_state, bw);
+			res = lms7_tbb_set_bandwidth(&dev->lms_state,j,bw);
 #endif
 			if (actualbw)
 				*actualbw = bw;
