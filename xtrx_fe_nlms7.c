@@ -1210,8 +1210,6 @@ int lms7nfe_bb_set_badwidth(struct xtrx_fe_obj* obj,
 			res = lms7_rbb_set_filter_bw(&dev->lms_state,j,bw);
 #else
 //			res = lms7_rbb_set_ext(&dev->lms_state);
-
-
 			///////////////// FIXMEEEEEEEEEE!!!!!!!!!!!!!!!!!!!!!!!!
 			res = lms7_rbb_set_path(&dev->lms_state, RBB_LBF);
 			if (res)
